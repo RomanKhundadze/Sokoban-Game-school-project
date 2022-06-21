@@ -1,4 +1,4 @@
 # Sokoban-Game-school-project-
-This is a just a small school project that i have to do. (unfinished)
+This is a just a small school project that i have to do. (ongoing)
 
 # [Map maker info](MapMakerInfo.md)
