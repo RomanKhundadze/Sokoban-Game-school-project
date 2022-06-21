@@ -17,21 +17,26 @@ class Point {
 class Gameboard{
 	private:
 		WINDOW *wnd;
+		WINDOW *stw;
 		Point max;
 		Point player;
+		Point status = {0,0};
 		char prestau = ' ';
 		char irestau = ' ';
-		WINDOW *loadGameboard(char **argv);
+		WINDOW *loadGameboard(int, int, char **argv);
+		WINDOW *loadStatus(int, int);
 		vector<Point> goals;
 	public:
 		Gameboard(int, int,char **argv);
 		virtual ~Gameboard();
 		virtual WINDOW *getWindowHandle();
+		virtual WINDOW *getStatusWindowHandle();
 		Point getPlayer();
 		void movePlayer(Point);
 		char getItem(Point pt);
 		void moveItem(Point from, Point to);
 		void displayGoals();
+		void displayStatus();
 		bool areGoalsComplete();
 
 };

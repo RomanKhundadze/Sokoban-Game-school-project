@@ -11,9 +11,12 @@ using namespace std;
 
 Gameboard::Gameboard( int pos1, int pos2, char **argv){
 	wnd = nullptr;
+	stw = nullptr;
 	initscr();
 
-	wnd = loadGameboard(argv);
+	wnd = loadGameboard( pos1, pos2, argv);
+	stw = loadStatus(pos1, pos2);
+
 	cbreak();
 	noecho();
 	clear();
@@ -30,10 +33,6 @@ Gameboard::Gameboard( int pos1, int pos2, char **argv){
 	init_pair(4, COLOR_WHITE, COLOR_BLACK);		//Box
 	wbkgd(wnd, COLOR_PAIR(1));
 
-	attron(A_BOLD);
-	//box(wnd, 0, 0);
-	attroff(A_BOLD);
-
 }
 
 Gameboard::~Gameboard() {
@@ -43,9 +42,14 @@ WINDOW *Gameboard::getWindowHandle() {
 	return wnd;
 }
 
-WINDOW *Gameboard::loadGameboard(char **argv){
-	WINDOW *w;
+WINDOW *Gameboard::getStatusWindowHandle(){
+	return stw;
+}
 
+WINDOW *Gameboard::loadGameboard(int pos1, int pos2, char **argv){
+
+	WINDOW *w;
+	
 	vector<string> vec;
 
 	// open stream for reading..
@@ -71,8 +75,8 @@ WINDOW *Gameboard::loadGameboard(char **argv){
 		}
 		max.y = vec.size();
 
-		w = newwin(max.y, max.x, 0 ,0);
-		
+		w = newwin(max.y, max.x, pos1, pos2);
+				
 		int adx = 0;
 		int ady = 0;
 		for(string xachse : vec)
@@ -104,13 +108,23 @@ WINDOW *Gameboard::loadGameboard(char **argv){
 			ady++;
 		}
 		f.close();
-
+		
 		return w;
 	} else {
 		cout << "Map Existiert nicht!" << endl;
 		endwin();
-		return 0;
 	}
+}
+
+WINDOW *Gameboard::loadStatus(int pos1, int pos2){
+	WINDOW *c;
+
+	c = newwin(2, 20, max.y+pos1, pos2);
+
+	mvwprintw(c, 0, 0, "Moves: %d", status.x);
+	mvwprintw(c, 1, 0, "Pushes: %d", status.y);
+
+	return c;
 }
 
 Point Gameboard::getPlayer(){
@@ -125,6 +139,7 @@ void Gameboard::movePlayer(Point move){
 		mvwaddch(wnd, player.y, player.x, prestau);
 		player = move;
 		prestau = ' ';
+		status.x++;
 	}
 	if(ch == '.' ){
 		prestau = '.';
@@ -140,6 +155,7 @@ void Gameboard::moveItem(Point from, Point to){
 	if('#' != ch && '$' != ch){
 		mvwaddch(wnd, to.y, to.x, '$'|COLOR_PAIR(4));
 		mvwaddch(wnd, from.y, from.x, irestau);
+		status.y++;
 	}
 
 }
@@ -151,7 +167,10 @@ void Gameboard::displayGoals(){
 		}
 	}
 }
-
+void Gameboard::displayStatus(){
+	mvwprintw(stw, 0, 0, "Moves: %d", status.x);
+	mvwprintw(stw, 1, 0, "Pushes: %d", status.y);
+}
 bool Gameboard::areGoalsComplete(){
 	int zahler = 0;
 	for (Point check : goals){
