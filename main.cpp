@@ -14,14 +14,17 @@ using namespace std;
 
 
 WINDOW *wnd;
+WINDOW *stw;
 shared_ptr<Gameboard> gb;					//Smart-Pointer auf das Gameboard-Objekt
 
 int init(char **argv) {
 	
 	Point move;
 	gb = make_shared<Gameboard>(0, 0, argv);		// Erstellen eines Gameboard-Objekt
-	wnd = gb->getWindowHandle();			// Holen des Ncurses-Handler
+	wnd = gb->getWindowHandle();
+	stw = gb->getStatusWindowHandle();				// Holen des Ncurses-Handler
 	wrefresh(wnd);
+	wrefresh(stw);
 	
 	return 0;											// Rückgabe immer 0
 }
@@ -54,6 +57,7 @@ void run() {
 			}
 			gb->movePlayer(move);
 			gb->displayGoals();
+			gb->displayStatus();
 	      break;
 	    case KEY_DOWN:  //down
 	    case 's':
@@ -67,6 +71,7 @@ void run() {
 			}
 			gb->movePlayer(move);
 			gb->displayGoals();
+			gb->displayStatus();
 	      break;
 	    case KEY_LEFT:   //left
 	    case 'a':
@@ -79,7 +84,8 @@ void run() {
 				gb->moveItem(move,itemBox);
 			}
 			gb->movePlayer(move);
-			gb->displayGoals(); 
+			gb->displayGoals();
+			gb->displayStatus();
 	      break;
 	    case KEY_RIGHT:
 	    case 'd':
@@ -93,12 +99,14 @@ void run() {
 			}
 			gb->movePlayer(move);
 			gb->displayGoals();
+			gb->displayStatus();
 	      break;
 	    default:
 	      break;
 	}
 	usleep(WAIT_TICK);  // 10ms
     wrefresh(wnd);
+	wrefresh(stw);
 	
    }
 }
