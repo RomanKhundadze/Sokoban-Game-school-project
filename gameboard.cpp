@@ -5,9 +5,15 @@
 #include <fstream>
 
 #include "gameboard.hpp"
+#include "logger.hpp"
+#include "later.hpp"
 
 using namespace std;
 
+void testCallback(int arg) {
+	Logger::getInstance()->log((char *)"Callback: %i", arg);
+	return;
+}
 
 Gameboard::Gameboard( int pos1, int pos2, char **argv){
 	wnd = nullptr;
@@ -32,7 +38,9 @@ Gameboard::Gameboard( int pos1, int pos2, char **argv){
 	init_pair(3, COLOR_MAGENTA, COLOR_BLACK);	//goal
 	init_pair(4, COLOR_WHITE, COLOR_BLACK);		//Box
 	wbkgd(wnd, COLOR_PAIR(1));
-
+	
+	Logger::getInstance()->log((char *)"Aufruf");
+	Later later_test(2000, true, &testCallback, 111);
 }
 
 Gameboard::~Gameboard() {
@@ -117,14 +125,12 @@ WINDOW *Gameboard::loadGameboard(int pos1, int pos2, char **argv){
 }
 
 WINDOW *Gameboard::loadStatus(int pos1, int pos2){
-	WINDOW *c;
 
-	c = newwin(2, 20, max.y+pos1, pos2);
+	stw = newwin(2, 20, max.y+pos1, pos2);
 
-	mvwprintw(c, 0, 0, "Moves: %d", status.x);
-	mvwprintw(c, 1, 0, "Pushes: %d", status.y);
+	displayStatus();
 
-	return c;
+	return stw;
 }
 
 Point Gameboard::getPlayer(){

@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "gameboard.hpp"
+#include "logger.hpp"
 
 #define WAIT_TICK 10000
 
