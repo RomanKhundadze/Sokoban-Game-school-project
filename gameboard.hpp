@@ -26,6 +26,7 @@ class Gameboard{
 		WINDOW *loadGameboard(int, int, char **argv);
 		WINDOW *loadStatus(int, int);
 		vector<Point> goals;
+		vector<int> time;
 	public:
 		Gameboard(int, int,char **argv);
 		virtual ~Gameboard();
@@ -38,7 +39,11 @@ class Gameboard{
 		void displayGoals();
 		void displayStatus();
 		bool areGoalsComplete();
-
+		static void callbackGreen (WINDOW *stw);
+		static void callbackYellow (WINDOW *stw);
+		static void callbackRed (WINDOW *stw);
+		static void callbackOut (WINDOW *stw);
+		void calculateTime(char **argv);
 };
 
 

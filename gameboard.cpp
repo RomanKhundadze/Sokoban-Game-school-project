@@ -10,11 +10,6 @@
 
 using namespace std;
 
-void testCallback(int arg) {
-	Logger::getInstance()->log((char *)"Callback: %i", arg);
-	return;
-}
-
 Gameboard::Gameboard( int pos1, int pos2, char **argv){
 	wnd = nullptr;
 	stw = nullptr;
@@ -37,10 +32,21 @@ Gameboard::Gameboard( int pos1, int pos2, char **argv){
 	init_pair(2, COLOR_CYAN, COLOR_BLACK);		//player
 	init_pair(3, COLOR_MAGENTA, COLOR_BLACK);	//goal
 	init_pair(4, COLOR_WHITE, COLOR_BLACK);		//Box
+	init_pair(5, COLOR_GREEN, COLOR_GREEN);		//Timmer
+	init_pair(6, COLOR_YELLOW, COLOR_YELLOW);	//Timer	
+	init_pair(7, COLOR_RED, COLOR_RED);			//Timer
+	init_pair(8, COLOR_BLACK, COLOR_BLACK);			//Timer
 	wbkgd(wnd, COLOR_PAIR(1));
+
+	calculateTime(argv);
+
+	mvwaddch(stw, 1, 16, ' '|COLOR_PAIR(5));
+	mvwaddch(stw, 1, 17, ' '|COLOR_PAIR(6));
+	mvwaddch(stw, 1, 18, ' '|COLOR_PAIR(7));
 	
-	Logger::getInstance()->log((char *)"Aufruf");
-	Later later_test(2000, true, &testCallback, 111);
+	Later green(time[0], true, &callbackGreen, stw);
+	Later yellow(time[1], true, &callbackYellow, stw);
+	Later red(time[2], true, &callbackRed, stw);
 }
 
 Gameboard::~Gameboard() {
@@ -125,8 +131,9 @@ WINDOW *Gameboard::loadGameboard(int pos1, int pos2, char **argv){
 }
 
 WINDOW *Gameboard::loadStatus(int pos1, int pos2){
+	int x = 20;
 
-	stw = newwin(2, 20, max.y+pos1, pos2);
+	stw = newwin(2, x, max.y+pos1, pos2);
 
 	displayStatus();
 
@@ -191,4 +198,27 @@ bool Gameboard::areGoalsComplete(){
 	if (zahler == goals.size()){
 		return true;
 	}
+}
+
+void Gameboard::calculateTime(char **argv){
+	int Time = stoi(argv[2]);
+
+	Time /= 100;
+
+	time.push_back(Time*70);
+	time.push_back(Time*90);
+	time.push_back(Time*100);
+	time.push_back(5000);
+}
+
+void Gameboard::callbackGreen(WINDOW *stw){
+	mvwaddch(stw, 1, 16, ' '|COLOR_PAIR(8));
+}
+
+void Gameboard::callbackYellow(WINDOW *stw){
+	mvwaddch(stw, 1, 17, ' '|COLOR_PAIR(8));
+}
+
+void Gameboard::callbackRed(WINDOW *stw){
+	mvwaddch(stw, 1, 18, ' '|COLOR_PAIR(8));
 }
